@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, BntxTournamentActivity!</string>
+    <string name="app_name">BntxTournament</string>
+    <string name="add_tournament">Add tournament</string>
+    <string name="add_team">Add team</string>
+    <string name="tournament_list">Tournament list</string>
+    <string name="team_list">Team list</string>
+    <string name="add_player">Add player</string>
+    <string name="player_list">Player list</string>
+    <string name="tournament">Tournament</string>
+    <string name="add_team_for_tournament">Add team for tournament</string>
+
+</resources>
