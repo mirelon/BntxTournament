@@ -1,5 +1,7 @@
 package com.bntx.tournament.row;
 
+import com.bntx.tournament.Globals;
+
 import android.content.ContentValues;
 
 public class Player extends Row {
@@ -39,6 +41,10 @@ public class Player extends Row {
 
 	public String getTableName() {
 		return "players";
+	}
+
+	public static Player getFromListItem(String listItem) {
+		return Globals.getDb().getPlayerById(parseIdFromListItem(listItem));
 	}
 	
 }

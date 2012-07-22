@@ -19,14 +19,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.list.TournamentListActivity"
-            android:label="@string/tournament_list" >
-        </activity>
-        <activity
-            android:name=".activity.AddTournamentActivity"
-            android:label="@string/add_tournament" >
-        </activity>
-        <activity
             android:name=".activity.list.TeamListActivity"
             android:label="@string/team_list" >
         </activity>
@@ -43,11 +35,7 @@
             android:label="@string/add_player" >
         </activity>
         <activity
-            android:name=".activity.TournamentActivity"
-            android:label="@string/tournament" >
-        </activity>
-        <activity
-            android:name=".activity.list.TeamListForTournamentActivity"
+            android:name=".activity.TeamActivity"
             android:label="@string/tournament" >
         </activity>
     </application>

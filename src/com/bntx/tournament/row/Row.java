@@ -1,8 +1,13 @@
 package com.bntx.tournament.row;
 
+
+import com.bntx.tournament.Globals;
+
 import android.content.ContentValues;
+import android.util.Log;
 
 public class Row {
+	
 
 	public static final String KEY_ID = "_id";
 	private Long id;
@@ -39,6 +44,20 @@ public class Row {
 	
 	public static Long parseIdFromListItem(String listItem) {
 		return Long.parseLong(listItem.split(":")[0]);
+	}
+	
+	public void delete() {
+		Globals.getDb().deleteRow(this);
+	}
+	
+	public void save() {
+		if(getId() == null) {
+			Log.d("Row", "addRow");
+			Globals.getDb().addRow(this);
+		} else {
+			Log.d("Row", "updateRow");
+			Globals.getDb().updateRow(this);
+		}
 	}
 	
 }
