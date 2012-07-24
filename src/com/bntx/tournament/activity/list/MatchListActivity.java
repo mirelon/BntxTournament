@@ -9,9 +9,12 @@ import com.bntx.tournament.R;
 import com.bntx.tournament.DeleteDialog.Deletable;
 import com.bntx.tournament.R.id;
 import com.bntx.tournament.R.layout;
+import com.bntx.tournament.activity.AddMatchActivity;
 import com.bntx.tournament.activity.AddTeamActivity;
 import com.bntx.tournament.activity.BntxTournamentActivity;
+import com.bntx.tournament.activity.MatchActivity;
 import com.bntx.tournament.activity.TeamActivity;
+import com.bntx.tournament.row.Match;
 import com.bntx.tournament.row.Team;
 
 import android.app.Activity;
@@ -29,7 +32,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class TeamListActivity extends Activity {
+public class MatchListActivity extends Activity {
 
 	protected ListView listView;
 	protected ArrayAdapter<String> adapter;
@@ -38,14 +41,14 @@ public class TeamListActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.team_list);
+		setContentView(R.layout.match_list);
 
-		Log.d("Team list has length: ", Integer.toString(getTeamList().size()));
+		Log.d("Match list has length: ", Integer.toString(getMatchList().size()));
 
 		listView = (ListView) findViewById(R.id.listView1);
 
 		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, getTeamList());
+				android.R.layout.simple_list_item_1, getMatchList());
 		listView.setAdapter(adapter);
 		
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -53,19 +56,9 @@ public class TeamListActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				Log.d("TeamListActivity", "item click");
-				if(Globals.isAddingTeam1ForMatch()) {
-					Globals.setSelectedTeam1ForMatch(Team.getFromListItem(((TextView)arg1).getText().toString()));
-					Globals.setAddingTeam1ForMatch(false);
-					TeamListActivity.this.finish();
-				} else if(Globals.isAddingTeam2ForMatch()) {
-					Globals.setSelectedTeam2ForMatch(Team.getFromListItem(((TextView)arg1).getText().toString()));
-					Globals.setAddingTeam2ForMatch(false);
-					TeamListActivity.this.finish();
-				} else {
-					Globals.setSelectedTeam(Team.getFromListItem(((TextView)arg1).getText().toString()));
-					startActivity(new Intent(TeamListActivity.this, TeamActivity.class));
-				}
+				Log.d("MatchListActivity", "item click");
+				Globals.setSelectedMatch(Match.getFromListItem(((TextView)arg1).getText().toString()));
+				startActivity(new Intent(MatchListActivity.this, MatchActivity.class));
 			}
 		});
 
@@ -74,19 +67,18 @@ public class TeamListActivity extends Activity {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
-				Log.d("TeamListActivity", "item long click");
+				Log.d("MatchListActivity", "item long click");
 
-				final Team team = Globals.getDb().getTeamById(Team
-						.parseIdFromListItem(((TextView) arg1).getText()
-								.toString()));
+				final Match match = Match.getFromListItem(((TextView) arg1).getText()
+								.toString());
 				DeleteDialog deleteDialog = new DeleteDialog(
-						TeamListActivity.this, "team " + team.getName());
+						MatchListActivity.this, "match " + match.toString());
 				deleteDialog.setDeletable(new Deletable() {
 
 					@Override
 					public void delete() {
-						Globals.getDb().deleteRow(team);
-						TeamListActivity.this.onResume();
+						match.delete();
+						MatchListActivity.this.onResume();
 					}
 				});
 				deleteDialog.show();
@@ -94,42 +86,35 @@ public class TeamListActivity extends Activity {
 			}
 		});
 
-		Button addTeamButton = (Button) findViewById(R.id.button1);
-		addTeamButton.setOnClickListener(new OnClickListener() {
+		Button addMatchButton = (Button) findViewById(R.id.button1);
+		addMatchButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 
-				Log.d("TeamListActivity", "click");
-				startActivity(new Intent(TeamListActivity.this,
-						AddTeamActivity.class));
+				Log.d("MatchListActivity", "click");
+				startActivity(new Intent(MatchListActivity.this,
+						AddMatchActivity.class));
 			}
 		});
 
 	}
 
-	public ArrayList<String> getTeamList() {
+	public ArrayList<String> getMatchList() {
 		ArrayList<String> list = new ArrayList<String>();
-		for (Team team : Globals.getDb().getAllTeams()) {
-			list.add(team.getIdWithName());
+		for (Match match : Globals.getDb().getAllMatches()) {
+			list.add(match.getIdWithName());
 		}
 		return list;
 	}
 
 	@Override
 	protected void onResume() {
-		Log.d("TeamListActivity", "onResume");
+		Log.d("MatchListActivity", "onResume");
 		super.onResume();
 		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, getTeamList());
+				android.R.layout.simple_list_item_1, getMatchList());
 		listView.setAdapter(adapter);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		Globals.setAddingTeam1ForMatch(false);
-		Globals.setAddingTeam2ForMatch(false);
 	}
 
 }

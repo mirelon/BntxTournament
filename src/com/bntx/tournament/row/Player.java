@@ -3,6 +3,7 @@ package com.bntx.tournament.row;
 import com.bntx.tournament.Globals;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 public class Player extends Row {
 	
@@ -10,6 +11,11 @@ public class Player extends Row {
 	private String name;
 	
 	public Player() {
+	}
+	
+	public Player(Cursor cursor) {
+		setId(Integer.parseInt(cursor.getString(0)));
+		setName(cursor.getString(1));
 	}
 	
 	/**

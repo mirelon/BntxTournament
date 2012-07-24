@@ -3,6 +3,7 @@ package com.bntx.tournament.row;
 import com.bntx.tournament.Globals;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 public class TeamPlayer extends Row {
 	
@@ -10,6 +11,16 @@ public class TeamPlayer extends Row {
 	private Long player_id;
 	
 	public TeamPlayer() {
+	}
+	
+	public static TeamPlayer getById(Long id) {
+		return Globals.getDb().getTeamPlayerById(id);
+	}
+	
+	public TeamPlayer(Cursor cursor) {
+        setId(Integer.parseInt(cursor.getString(0)));
+        setTeamId(Long.parseLong(cursor.getString(1)));
+        setPlayerId(Long.parseLong(cursor.getString(2)));
 	}
 	/**
 	 * Will be used by ArrayAdapter

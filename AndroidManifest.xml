@@ -38,6 +38,22 @@
             android:name=".activity.TeamActivity"
             android:label="@string/tournament" >
         </activity>
+        <activity
+            android:name=".activity.list.MatchListActivity"
+            android:label="@string/match_list" >
+        </activity>
+        <activity
+            android:name=".activity.AddMatchActivity"
+            android:label="@string/add_match" >
+        </activity>
+        <activity
+            android:name=".activity.MatchActivity"
+            android:label="@string/match" >
+        </activity>
+        <activity
+            android:name=".activity.list.ActivePlayerListActivity"
+            android:label="@string/player_list" >
+        </activity>
     </application>
 
 </manifest>

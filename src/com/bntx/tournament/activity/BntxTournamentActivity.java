@@ -5,6 +5,7 @@ import com.bntx.tournament.Globals;
 import com.bntx.tournament.R;
 import com.bntx.tournament.R.id;
 import com.bntx.tournament.R.layout;
+import com.bntx.tournament.activity.list.MatchListActivity;
 import com.bntx.tournament.activity.list.PlayerListActivity;
 import com.bntx.tournament.activity.list.TeamListActivity;
 
@@ -45,6 +46,17 @@ public class BntxTournamentActivity extends Activity {
 		        Log.d("BntxTournamentActivity", "players click");
 		        Globals.setSelectedTeam(null);
 				startActivity(new Intent(BntxTournamentActivity.this, PlayerListActivity.class));
+			}
+		});
+
+        Button matchesButton = (Button) findViewById(R.id.button1);
+        matchesButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+
+		        Log.d("BntxTournamentActivity", "matches click");
+				startActivity(new Intent(BntxTournamentActivity.this, MatchListActivity.class));
 			}
 		});
     }

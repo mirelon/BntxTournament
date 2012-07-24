@@ -1,12 +1,17 @@
 package com.bntx.tournament;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bntx.tournament.row.Event;
+import com.bntx.tournament.row.Match;
 import com.bntx.tournament.row.Player;
 import com.bntx.tournament.row.Row;
 import com.bntx.tournament.row.Team;
 import com.bntx.tournament.row.TeamPlayer;
+import com.bntx.tournament.table.EventsTable;
+import com.bntx.tournament.table.MatchesTable;
 import com.bntx.tournament.table.PlayersTable;
 import com.bntx.tournament.table.TeamsPlayersTable;
 import com.bntx.tournament.table.TeamsTable;
@@ -21,7 +26,7 @@ import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 10;
 	public static final String KEY_ID = "_id";
 	
     private static final String DATABASE_NAME = "tournaments.db";
@@ -38,6 +43,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         TeamsTable.onCreate(db);
         PlayersTable.onCreate(db);
         TeamsPlayersTable.onCreate(db);
+        MatchesTable.onCreate(db);
+        EventsTable.onCreate(db);
     }
  
     // Upgrading database
@@ -47,6 +54,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	TeamsTable.onUpgrade(db, oldVersion, newVersion);
     	PlayersTable.onUpgrade(db, oldVersion, newVersion);
     	TeamsPlayersTable.onUpgrade(db, oldVersion, newVersion);
+    	MatchesTable.onUpgrade(db, oldVersion, newVersion);
+    	EventsTable.onUpgrade(db, oldVersion, newVersion);
     }
     
     public void addRow(Row row) {
@@ -76,16 +85,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      
         if (cursor.moveToFirst()) {
             do {
-            	Team team = new Team();
-                team.setId(Integer.parseInt(cursor.getString(0)));
-                team.setName(cursor.getString(1));
-                teamList.add(team);
+                teamList.add(new Team(cursor));
             } while (cursor.moveToNext());
         }
      
         return teamList;
     }
-    
+
     public List<Player> getAllPlayers() {
         List<Player> playerList = new ArrayList<Player>();
         String selectQuery = "SELECT  * FROM players";
@@ -95,14 +101,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      
         if (cursor.moveToFirst()) {
             do {
-            	Player player = new Player();
-                player.setId(Integer.parseInt(cursor.getString(0)));
-                player.setName(cursor.getString(1));
-                playerList.add(player);
+                playerList.add(new Player(cursor));
             } while (cursor.moveToNext());
         }
      
         return playerList;
+    }
+
+    public List<Match> getAllMatches() {
+        List<Match> matchList = new ArrayList<Match>();
+        String selectQuery = "SELECT  * FROM matches";
+     
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+     
+        if (cursor.moveToFirst()) {
+            do {
+                matchList.add(new Match(cursor));
+            } while (cursor.moveToNext());
+        }
+     
+        return matchList;
+    }
+
+    public List<Event> getAllEvents() {
+        List<Event> eventList = new ArrayList<Event>();
+        String selectQuery = "SELECT  * FROM events";
+     
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+     
+        if (cursor.moveToFirst()) {
+            do {
+                eventList.add(new Event(cursor));
+            } while (cursor.moveToNext());
+        }
+     
+        return eventList;
     }
     
     public List<Player> getPlayersNotInTeam(Team team) {
@@ -123,10 +158,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	SQLiteDatabase db = this.getWritableDatabase();
     	Cursor cursor = db.rawQuery(selectQuery, null);
     	if (cursor.moveToFirst()) {
-    		Team team = new Team();
-    		team.setId(Integer.parseInt(cursor.getString(0)));
-    		team.setName(cursor.getString(1));
-    		return team;
+    		return new Team(cursor);
+    	}
+    	return null;
+    }
+    
+    public Match getMatchById(Long match_id) {
+    	String selectQuery = "SELECT * FROM matches WHERE _id = " + match_id;
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	if (cursor.moveToFirst()) {
+    		return new Match(cursor);
     	}
     	return null;
     }
@@ -136,10 +178,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	SQLiteDatabase db = this.getWritableDatabase();
     	Cursor cursor = db.rawQuery(selectQuery, null);
     	if (cursor.moveToFirst()) {
-    		Player player = new Player();
-    		player.setId(Integer.parseInt(cursor.getString(0)));
-    		player.setName(cursor.getString(1));
-    		return player;
+    		return new Player(cursor);
     	}
     	return null;
     }
@@ -151,11 +190,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	SQLiteDatabase db = this.getWritableDatabase();
     	Cursor cursor = db.rawQuery(selectQuery, null);
     	if (cursor.moveToFirst()) {
-    		TeamPlayer teamPlayer = new TeamPlayer();
-    		teamPlayer.setId(Integer.parseInt(cursor.getString(0)));
-            teamPlayer.setTeamId(Long.parseLong(cursor.getString(1)));
-            teamPlayer.setPlayerId(Long.parseLong(cursor.getString(2)));
-    		return teamPlayer;
+    		return new TeamPlayer(cursor);
+    	}
+    	return null;
+    }
+
+    public Event getEventById(Long event_id) {
+    	String selectQuery = "SELECT * FROM events WHERE _id = " + event_id;
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	if (cursor.moveToFirst()) {
+    		return new Event(cursor);
     	}
     	return null;
     }
@@ -170,15 +215,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      
         if (cursor.moveToFirst()) {
             do {
-            	TeamPlayer teamPlayer = new TeamPlayer();
-                teamPlayer.setId(Integer.parseInt(cursor.getString(0)));
-                teamPlayer.setTeamId(Long.parseLong(cursor.getString(1)));
-                teamPlayer.setPlayerId(Long.parseLong(cursor.getString(2)));
-                teamPlayerList.add(teamPlayer);
+                teamPlayerList.add(new TeamPlayer(cursor));
             } while (cursor.moveToNext());
         }
      
         return teamPlayerList;
+    }
+    
+    public List<Event> getEventsForMatch(Match match) {
+    	List<Event> eventList = new ArrayList<Event>();
+    	String selectQuery = "SELECT * FROM events WHERE match_id = " + match.getId();
+    	
+    	SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+     
+        if (cursor.moveToFirst()) {
+            do {
+            	eventList.add(new Event(cursor));
+            } while (cursor.moveToNext());
+        }
+     
+        return eventList;
     }
     
 }
