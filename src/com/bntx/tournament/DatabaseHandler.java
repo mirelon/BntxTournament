@@ -23,7 +23,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-
+/**
+ * TODO: close database after operations
+ * @author Miso | michal.kovac@bonetics.com
+ * Bonetics, s.r.o. | http://bonetics.com | fb|tw - @bonetics
+ *
+ */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 10;
@@ -209,6 +214,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<TeamPlayer> getPlayersForTeam(Team team) {
         List<TeamPlayer> teamPlayerList = new ArrayList<TeamPlayer>();
         String selectQuery = "SELECT teams_players.*, players.name FROM teams_players JOIN players ON teams_players.player_id = players._id WHERE team_id = " + team.getId();
+        Log.d("getPlayersForTeam", selectQuery);
      
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -236,6 +242,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
      
         return eventList;
+    }
+    
+    public int getPointsForTeamInMatch(Team team, Match match) {
+
+    	String selectQuery = "SELECT COUNT(*) FROM events JOIN teams_players ON events.target_id = teams_players._id WHERE events.code = " + Event.SCORE + " AND teams_players.team_id = " + team.getId() + " AND match_id = " + match.getId();
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	if (cursor.moveToFirst()) {
+    		return cursor.getInt(0);
+    	}
+    	return (Integer) null;
     }
     
 }

@@ -44,19 +44,7 @@ public class ActivePlayerListActivity extends Activity {
 				CheckedTextView ctv = (CheckedTextView)arg1;
 				Log.d("Click: ", ctv.getText().toString() + ", checked = " + ctv.isChecked());
 				TeamPlayer teamPlayer = TeamPlayer.getFromListItem(ctv.getText().toString());
-				Event event = new Event();
-				event.setTimestamp(new Timestamp(Calendar.getInstance().getTime().getTime()));
-				/**
-				 * itemClickEvent is called before the checked state changes
-				 */
-				if(ctv.isChecked()) {
-					event.setCode(Event.CODE_PLAYER_DOWN);
-				} else {
-					event.setCode(Event.CODE_PLAYER_UP);
-				}
-				event.setMatchId(Globals.getSelectedMatch().getId());
-				event.setTargetId(teamPlayer.getId());
-				event.save();
+				Globals.getSelectedMatch().addEvent(ctv.isChecked()?Event.PLAYER_DOWN:Event.PLAYER_UP, teamPlayer.getId());
 				adapter.setActivePlayerList(getActivePlayers());
 				adapter.notifyDataSetChanged();
 			}

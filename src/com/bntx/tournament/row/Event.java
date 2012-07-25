@@ -1,6 +1,7 @@
 package com.bntx.tournament.row;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import com.bntx.tournament.Globals;
@@ -11,24 +12,24 @@ import android.util.Log;
 
 public class Event extends Row {
 
-	public static Long CODE_START = 1L;
-	public static Long CODE_END = 2L;
-	public static Long CODE_PASS = 3L;
-	public static Long CODE_CATCH = 4L;
-	public static Long CODE_BAD_PASS = 5L;
-	public static Long CODE_PULL = 6L;
-	public static Long CODE_DROP_PULL = 7L;
-	public static Long CODE_BLOCK = 8L;
-	public static Long CODE_GREATEST = 8L;
-	public static Long CODE_LAYOUT_CATCH = 9L;
-	public static Long CODE_LAYOUT_BLOCK = 10L;
-	public static Long CODE_ASSIST = 11L;
-	public static Long CODE_SCORE = 12L;
-	public static Long CODE_HALF_TIME = 13L;
-	public static Long CODE_TIMEOUT = 14L;
-	public static Long CODE_INJURY = 15L;
-	public static Long CODE_PLAYER_DOWN = 16L;
-	public static Long CODE_PLAYER_UP = 17L;
+	public static Long START = 1L;
+	public static Long END = 2L;
+	public static Long PASS = 3L;
+	public static Long CATCH = 4L;
+	public static Long BAD_PASS = 5L;
+	public static Long PULL = 6L;
+	public static Long DROP_PULL = 7L;
+	public static Long BLOCK = 8L;
+	public static Long GREATEST = 8L;
+	public static Long LAYOUT_CATCH = 9L;
+	public static Long LAYOUT_BLOCK = 10L;
+	public static Long ASSIST = 11L;
+	public static Long SCORE = 12L;
+	public static Long HALF_TIME = 13L;
+	public static Long TIMEOUT = 14L;
+	public static Long INJURY = 15L;
+	public static Long PLAYER_DOWN = 16L;
+	public static Long PLAYER_UP = 17L;
 		
 	
 	private Long code;
@@ -64,24 +65,24 @@ public class Event extends Row {
 	}
 	
 	public String getName() {
-		if(getCode() == CODE_START)return "start";
-		if(getCode() == CODE_END)return "end";
-		if(getCode() == CODE_PASS)return "pass";
-		if(getCode() == CODE_CATCH)return "catch";
-		if(getCode() == CODE_BAD_PASS)return "bad pass";
-		if(getCode() == CODE_PULL)return "pull";
-		if(getCode() == CODE_DROP_PULL)return "drop pull";
-		if(getCode() == CODE_BLOCK)return "block";
-		if(getCode() == CODE_GREATEST)return "greatest";
-		if(getCode() == CODE_LAYOUT_CATCH)return "layout catch";
-		if(getCode() == CODE_LAYOUT_BLOCK)return "layout block";
-		if(getCode() == CODE_ASSIST)return "assist";
-		if(getCode() == CODE_SCORE)return "score";
-		if(getCode() == CODE_HALF_TIME)return "half time";
-		if(getCode() == CODE_TIMEOUT)return "timeout";
-		if(getCode() == CODE_INJURY)return "injury";
-		if(getCode() == CODE_PLAYER_DOWN)return "player down";
-		if(getCode() == CODE_PLAYER_UP)return "player up";
+		if(getCode() == START)return "start";
+		if(getCode() == END)return "end";
+		if(getCode() == PASS)return "pass";
+		if(getCode() == CATCH)return "catch";
+		if(getCode() == BAD_PASS)return "bad pass";
+		if(getCode() == PULL)return "pull";
+		if(getCode() == DROP_PULL)return "drop pull";
+		if(getCode() == BLOCK)return "block";
+		if(getCode() == GREATEST)return "greatest";
+		if(getCode() == LAYOUT_CATCH)return "layout catch";
+		if(getCode() == LAYOUT_BLOCK)return "layout block";
+		if(getCode() == ASSIST)return "assist";
+		if(getCode() == SCORE)return "score";
+		if(getCode() == HALF_TIME)return "half time";
+		if(getCode() == TIMEOUT)return "timeout";
+		if(getCode() == INJURY)return "injury";
+		if(getCode() == PLAYER_DOWN)return "player down";
+		if(getCode() == PLAYER_UP)return "player up";
 		return "";
 	}
 	
@@ -143,6 +144,10 @@ public class Event extends Row {
 	 */
 	public Timestamp getTimestamp() {
 		return timestamp;
+	}
+	
+	public void setTimestampNow() {
+		setTimestamp(new Timestamp(Calendar.getInstance().getTime().getTime()));
 	}
 
 	/**

@@ -9,6 +9,7 @@ public class TeamPlayer extends Row {
 	
 	private Long team_id;
 	private Long player_id;
+	private String name;
 	
 	public TeamPlayer() {
 	}
@@ -21,6 +22,7 @@ public class TeamPlayer extends Row {
         setId(Integer.parseInt(cursor.getString(0)));
         setTeamId(Long.parseLong(cursor.getString(1)));
         setPlayerId(Long.parseLong(cursor.getString(2)));
+        setName(cursor.getString(3));
 	}
 	/**
 	 * Will be used by ArrayAdapter
@@ -74,11 +76,18 @@ public class TeamPlayer extends Row {
 	}
 	
 	public String getName() {
-		return getPlayer().getName();
+		return name;
 	}
 
 	public static TeamPlayer getFromListItem(String listItem) {
 		return Globals.getDb().getTeamPlayerById(parseIdFromListItem(listItem));
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 }
