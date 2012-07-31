@@ -21,5 +21,6 @@
     <string name="match">Match</string>
     <string name="assist">Assist</string>
     <string name="score">Score</string>
+    <string name="import_db2">Import from db2</string>
 
 </resources>

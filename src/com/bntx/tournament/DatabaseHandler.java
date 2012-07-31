@@ -31,10 +31,10 @@ import android.util.Log;
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 10;
+	private static final int DATABASE_VERSION = 11;
 	public static final String KEY_ID = "_id";
 	
-    private static final String DATABASE_NAME = "tournaments.db";
+    private static final String DATABASE_NAME = "/sdcard/BntxTournament/db1.db";
  
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -265,6 +265,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	}
     	db.close();
     	return points;
+    }
+    
+    public void importFromDb(String filename) {
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	db.execSQL("ATTACH DATABASE ? AS db2;", new Object[]{filename});
+    	db.execSQL("INSERT INTO events(timestamp, code, target_id, match_id) SELECT timestamp, code, target_id, match_id FROM db2.events;", new Object[]{});
     }
     
 }
