@@ -3,27 +3,19 @@ package com.bntx.tournament.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.color;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -102,31 +94,6 @@ public class MatchActivity extends Activity {
 		});
 		
 		updateScoreBoard();
-		
-		Button button1 = (Button) findViewById(R.id.button1);
-		button1.setText(getTeam1().getName() + " active players");
-		button1.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Log.d("MatchActivity", "team1 click");
-				Globals.setSelectedTeam(getTeam1());
-				startActivity(new Intent(MatchActivity.this,
-						ActivePlayerListActivity.class));
-			}
-		});
-		Button button2 = (Button) findViewById(R.id.button2);
-		button2.setText(getTeam2().getName() + " active players");
-		button2.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Log.d("MatchActivity", "team2 click");
-				Globals.setSelectedTeam(getTeam2());
-				startActivity(new Intent(MatchActivity.this,
-						ActivePlayerListActivity.class));
-			}
-		});
 
 		Button button3 = (Button) findViewById(R.id.button3);
 		button3.setOnClickListener(new OnClickListener() {
@@ -237,7 +204,7 @@ public class MatchActivity extends Activity {
 		if(Globals.getSelectedTeam() == null) {
 			return playerList;
 		}
-		playerList = Globals.getSelectedMatch().getActivePlayersForTeam(Globals.getSelectedTeam());
+		playerList = Globals.getSelectedTeam().getPlayers();
 		if(allowNull) {
 			TeamPlayer nullPlayer = new TeamPlayer();
 			nullPlayer.setId(0L);
