@@ -272,5 +272,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	db.execSQL("ATTACH DATABASE ? AS db2;", new Object[]{filename});
     	db.execSQL("INSERT INTO events(timestamp, code, target_id, match_id) SELECT timestamp, code, target_id, match_id FROM db2.events;", new Object[]{});
     }
+
+    public List<Object[]> getPlayersWithHighestEventCount(Long eventCode, Integer limit) {
+    	List<Object[]> playerList = new ArrayList<Object[]>();
+    	String selectQuery = "SELECT players.name, COUNT(*) AS total FROM players JOIN teams_players ON teams_players.player_id = players._id JOIN events ON events.target_id = teams_players._id WHERE events.code = ? GROUP BY players._id ORDER BY total DESC LIMIT ?;";
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	Cursor cursor = db.rawQuery(selectQuery, new String[]{eventCode.toString(), limit.toString()});
+    	if (cursor.moveToFirst()) {
+    		do {
+    			playerList.add(new Object[]{cursor.getString(0), cursor.getLong(1)});
+            } while (cursor.moveToNext());
+    	}
+    	return playerList;
+    }
+
+    public List<Object[]> getHighScorers(int limit) {
+    	return getPlayersWithHighestEventCount(Event.SCORE, limit);
+    }
+    
+    public List<Object[]> getHighAssists(int limit) {
+    	return getPlayersWithHighestEventCount(Event.ASSIST, limit);
+    }
     
 }
