@@ -102,6 +102,10 @@ public class Match extends Row {
 		this.team2_id = team2_id;
 	}
 	
+	public Event addEvent(Long code) {
+		return addEvent(code, 0L);
+	}
+	
 	public Event addEvent(Long code, Long target_id) {
 		return addEvent(code, target_id, new Timestamp(Calendar.getInstance().getTime().getTime()));
 	}
@@ -212,6 +216,63 @@ public class Match extends Row {
 	 */
 	public void setTeam2Points(int team2Points) {
 		this.team2Points = team2Points;
+	}
+	
+	public boolean isAfterHalfTime() {
+		for (Event event : getEvents()) {
+			if(event.getCode() == Event.HALF_TIME) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void start() {
+		addEvent(Event.START);
+	}
+	
+	public void halfTime() {
+		addEvent(Event.HALF_TIME);
+	}
+	
+	public void end() {
+		addEvent(Event.END);
+	}
+	
+	/**
+	 * Based on events. Returns null if no team is offending.
+	 * @return Team
+	 */
+	public Team getOffendingTeam() {
+		List<Event> eventList = getEvents();
+		if(eventList.size() == 0) return null;
+		Event event = eventList.get(eventList.size() - 1);
+		if(event.getCode() == Event.SCORE || event.getCode() == Event.ASSIST) {
+			return null; // pull is needed
+		}
+		if(event.getCode() == Event.BLOCK) {
+			return Team.getById(event.getTargetId());
+		}
+		if(event.getCode() == Event.PULL) {
+			return getOtherTeam(event.getTargetId());
+		}
+		return null;
+	}
+	
+	public Long getOtherTeamId(Long teamId) {
+		if(getTeam1Id() == teamId) return getTeam2Id();
+		if(getTeam2Id() == teamId) return getTeam1Id();
+		return null;
+	}
+	
+	public Team getOtherTeam(Long teamId) {
+		if(getTeam1Id() == teamId) return getTeam2();
+		if(getTeam2Id() == teamId) return getTeam1();
+		return null;
+	}
+	
+	public int getNumberOfBlocksForTeam(Long teamId) {
+		return Globals.getDb().getBlocksForTeamInMatch(Team.getById(teamId), this);
 	}
 	
 }

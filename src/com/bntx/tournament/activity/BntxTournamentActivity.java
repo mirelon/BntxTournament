@@ -2,6 +2,8 @@ package com.bntx.tournament.activity;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -92,15 +94,16 @@ public class BntxTournamentActivity extends Activity {
 		        Log.d("BntxTournamentActivity", "statistics click");
 
 		        String statisticsText = "Highest scorers:\n";
-		        List<Object[]> highScorers = Globals.getDb().getHighScorers(5);
+		        List<Object[]> highScorers = Globals.getDb().getHighScorers(15);
 		        for (Object[] objects : highScorers) {
 					statisticsText += objects[1] + ": " + objects[0] + "\n";
 				}
-		        List<Object[]> highAssists = Globals.getDb().getHighAssists(5);
+		        List<Object[]> highAssists = Globals.getDb().getHighAssists(15);
 		        statisticsText += "Highest assists:\n";
 		        for (Object[] objects : highAssists) {
 					statisticsText += objects[1] + ": " + objects[0] + "\n";
 				}
+		        statisticsText += Globals.getDb().getTimeStatistics();
 		        AlertDialog.Builder builder = new AlertDialog.Builder(BntxTournamentActivity.this);
 		        builder.setMessage(statisticsText);
 		        builder.show();

@@ -14,6 +14,10 @@ public class Team extends Row {
 	
 	public Team() {
 	}
+
+	public static Team getById(Long id) {
+		return Globals.getDb().getTeamById(id);
+	}
 	
 	public Team(Cursor cursor) {
 		setId(Integer.parseInt(cursor.getString(0)));

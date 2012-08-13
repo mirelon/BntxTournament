@@ -23,5 +23,7 @@
     <string name="score">Score</string>
     <string name="import_db2">Import from db2</string>
     <string name="statistics">Statistics</string>
+    <string name="half_time">Half time</string>
+    <string name="end">End</string>
 
 </resources>

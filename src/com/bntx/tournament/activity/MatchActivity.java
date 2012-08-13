@@ -23,6 +23,7 @@ import com.bntx.tournament.Globals;
 import com.bntx.tournament.R;
 import com.bntx.tournament.activity.list.ActivePlayerListActivity;
 import com.bntx.tournament.adapter.ScorePlayerAdapter;
+import com.bntx.tournament.row.Match;
 import com.bntx.tournament.row.Team;
 import com.bntx.tournament.row.TeamPlayer;
 
@@ -53,8 +54,19 @@ public class MatchActivity extends Activity {
 		setContentView(R.layout.match);
 		
 		Globals.setSelectedTeam(null);
+		if(Globals.getSelectedMatch().getEvents().size() == 0) {
+			Globals.getSelectedMatch().start();
+		} else {
+			Globals.setSelectedTeam(Globals.getSelectedMatch().getOffendingTeam());
+		}
 
 		textView1 = (TextView) findViewById(R.id.textView1);
+		textView3 = (TextView) findViewById(R.id.textView3);
+		Button button3 = (Button) findViewById(R.id.button3);
+		final Button button1 = (Button) findViewById(R.id.button1);
+		
+		updateScoreBoard();
+		
 		textView1.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -73,7 +85,7 @@ public class MatchActivity extends Activity {
 				}
 			}
 		});
-		textView3 = (TextView) findViewById(R.id.textView3);
+		
 		textView3.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -93,9 +105,8 @@ public class MatchActivity extends Activity {
 			}
 		});
 		
-		updateScoreBoard();
 
-		Button button3 = (Button) findViewById(R.id.button3);
+		
 		button3.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -112,6 +123,24 @@ public class MatchActivity extends Activity {
 					Globals.setSelectedTeam(null);
 					updateScoreBoard();
 					reloadSpinners();
+				}
+			}
+		});
+		
+		
+		button1.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Log.d("MatchActivity", "half-time click");
+				Match match = Globals.getSelectedMatch();
+				if(match.isAfterHalfTime()) {
+					match.end();
+					Globals.setSelectedTeam(null);
+				} else {
+					match.halfTime();
+					Globals.setSelectedTeam(null);
+					button1.setText(R.string.end);
 				}
 			}
 		});

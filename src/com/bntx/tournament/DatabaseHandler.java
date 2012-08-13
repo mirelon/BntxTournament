@@ -2,7 +2,10 @@ package com.bntx.tournament;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import com.bntx.tournament.row.Event;
 import com.bntx.tournament.row.Match;
@@ -31,7 +34,7 @@ import android.util.Log;
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 11;
+	private static final int DATABASE_VERSION = 12;
 	public static final String KEY_ID = "_id";
 	
     private static final String DATABASE_NAME = "/sdcard/BntxTournament/db1.db";
@@ -116,6 +119,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Match> getAllMatches() {
         List<Match> matchList = new ArrayList<Match>();
         String selectQuery = "SELECT  * FROM matches";
+     
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+     
+        if (cursor.moveToFirst()) {
+            do {
+                matchList.add(new Match(cursor));
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return matchList;
+    }
+
+
+    public List<Match> getNotEndedMatches() {
+        List<Match> matchList = new ArrayList<Match>();
+        String selectQuery = "SELECT * FROM matches WHERE matches._id NOT IN (SELECT events.match_id FROM events WHERE events.code = " + Event.END +")";
      
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -240,7 +260,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     
     public List<Event> getEventsForMatch(Match match) {
     	List<Event> eventList = new ArrayList<Event>();
-    	String selectQuery = "SELECT * FROM events WHERE match_id = " + match.getId();
+    	String selectQuery = "SELECT * FROM events WHERE match_id = " + match.getId() + " ORDER BY timestamp ASC";
     	
     	SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -253,10 +273,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return eventList;
     }
-    
+
     public int getPointsForTeamInMatch(Team team, Match match) {
 
     	String selectQuery = "SELECT COUNT(*) FROM events JOIN teams_players ON events.target_id = teams_players._id WHERE events.code = " + Event.SCORE + " AND teams_players.team_id = " + team.getId() + " AND match_id = " + match.getId();
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	Integer points = null;
+    	if (cursor.moveToFirst()) {
+    		points = cursor.getInt(0);
+    	}
+    	db.close();
+    	return points;
+    }
+
+    public int getBlocksForTeamInMatch(Team team, Match match) {
+
+    	String selectQuery = "SELECT COUNT(*) FROM events WHERE code = " + Event.BLOCK + " AND target_id = " + team.getId() + " AND match_id = " + match.getId();
     	SQLiteDatabase db = this.getWritableDatabase();
     	Cursor cursor = db.rawQuery(selectQuery, null);
     	Integer points = null;
@@ -292,6 +325,80 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     
     public List<Object[]> getHighAssists(int limit) {
     	return getPlayersWithHighestEventCount(Event.ASSIST, limit);
+    }
+    public String getTimeStatistics() {
+    	String stats = "";
+		TreeMap<String, Long> offendingTimeForOnePoint = new TreeMap<String, Long>();
+		TreeMap<String, Long> offendingTimePercentForMatch = new TreeMap<String, Long>();
+		TreeMap<String, Long> scoreVsDropPercentForMatch = new TreeMap<String, Long>();
+    	for (Match match : getAllMatches()) {
+
+        	HashMap<Long, Long> offenseTimeForTeam = new HashMap<Long, Long>();
+        	HashMap<Long, Long> pointsForTeam = new HashMap<Long, Long>();
+    		if(!offenseTimeForTeam.keySet().contains(match.getTeam1Id())) {
+    			offenseTimeForTeam.put(match.getTeam1Id(), 0L);
+    		}
+    		if(!offenseTimeForTeam.keySet().contains(match.getTeam2Id())) {
+    			offenseTimeForTeam.put(match.getTeam2Id(), 0L);
+    		}
+    		if(!pointsForTeam.keySet().contains(match.getTeam1Id())) {
+    			pointsForTeam.put(match.getTeam1Id(), 0L);
+    		}
+    		if(!pointsForTeam.keySet().contains(match.getTeam2Id())) {
+    			pointsForTeam.put(match.getTeam2Id(), 0L);
+    		}
+    		
+    		Timestamp lastTimestamp = new Timestamp(0L);
+    		Long offendingTeamId = 0L;
+    		
+			for (Event event : match.getEvents()) {
+				Log.d("event code: ", event.getCode().toString());
+				Log.d("event timestamp: ", event.getTimestamp().toString() + " " + event.getTimestamp().getTime());
+				if(event.getCode() == Event.PULL) {
+					lastTimestamp = event.getTimestamp();
+					offendingTeamId = match.getOtherTeamId(event.getTargetId());
+				}
+				else if(event.getCode() == Event.BLOCK) {
+					offenseTimeForTeam.put(offendingTeamId, offenseTimeForTeam.get(offendingTeamId) + event.getTimestamp().getTime() - lastTimestamp.getTime());
+					Log.d("team " + offendingTeamId + "dropped the disc, offending time:", offenseTimeForTeam.get(offendingTeamId).toString());
+					lastTimestamp = event.getTimestamp();
+					offendingTeamId = event.getTargetId();
+				}
+				else if(event.getCode() == Event.SCORE) {
+					offenseTimeForTeam.put(offendingTeamId, offenseTimeForTeam.get(offendingTeamId) + event.getTimestamp().getTime() - lastTimestamp.getTime());
+					Log.d("team " + offendingTeamId + "scored, offending time:", offenseTimeForTeam.get(offendingTeamId).toString());
+					pointsForTeam.put(offendingTeamId, pointsForTeam.get(offendingTeamId) + 1);
+					lastTimestamp = event.getTimestamp();
+					offendingTeamId = event.getTargetId();
+				}
+			}
+			for (Entry<Long, Long> entry : pointsForTeam.entrySet()) {
+				String vzapase = Team.getById(entry.getKey()).getName() + " v zapase s " + match.getOtherTeam(entry.getKey()).getName();
+				if(entry.getValue() > 0) {
+					offendingTimeForOnePoint.put(vzapase,
+							offenseTimeForTeam.get(entry.getKey()) / entry.getValue() / 1000);
+					offendingTimePercentForMatch.put(vzapase,
+							100*offenseTimeForTeam.get(entry.getKey()) / (offenseTimeForTeam.get(entry.getKey()) + offenseTimeForTeam.get(match.getOtherTeamId(entry.getKey()))));
+					scoreVsDropPercentForMatch.put(vzapase,
+							100 * pointsForTeam.get(entry.getKey()) / (pointsForTeam.get(entry.getKey()) + match.getNumberOfBlocksForTeam(match.getOtherTeamId(entry.getKey()))));
+				}
+			}
+			
+		}
+    	stats += "Least effective teams (time needed to score):\n";
+    	for (Entry<String, Long> entry : offendingTimeForOnePoint.entrySet()) {
+			stats += entry.getKey() + ": " + entry.getValue() / 60 + ":" + entry.getValue() % 60 + "\n";  
+		}
+    	stats += "Most pressing teams (offense time in percent):\n";
+    	for (Entry<String, Long> entry : offendingTimePercentForMatch.entrySet()) {
+			stats += entry.getKey() + ": " + entry.getValue() + "%\n";
+		}
+    	stats += "Most effective teams (chance to score when offending):\n";
+    	for (Entry<String, Long> entry : scoreVsDropPercentForMatch.entrySet()) {
+			stats += entry.getKey() + ": " + entry.getValue() + "%\n";
+		}
+    	return stats;
+    	
     }
     
 }
