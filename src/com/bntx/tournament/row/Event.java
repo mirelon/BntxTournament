@@ -30,6 +30,8 @@ public class Event extends Row {
 	public static Long INJURY = 15L;
 	public static Long PLAYER_DOWN = 16L;
 	public static Long PLAYER_UP = 17L;
+	public static Long FREEZE = 18L;
+	public static Long PLAY_ON = 19L;
 		
 	
 	private Long code;
@@ -83,6 +85,8 @@ public class Event extends Row {
 		if(getCode() == INJURY)return "injury";
 		if(getCode() == PLAYER_DOWN)return "player down";
 		if(getCode() == PLAYER_UP)return "player up";
+		if(getCode() == FREEZE)return "freeze";
+		if(getCode() == PLAY_ON)return "play on";
 		return "";
 	}
 	

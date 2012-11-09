@@ -2,6 +2,7 @@ package com.bntx.tournament;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -34,7 +35,7 @@ import android.util.Log;
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 12;
+	private static final int DATABASE_VERSION = 13;
 	public static final String KEY_ID = "_id";
 	
     private static final String DATABASE_NAME = "/sdcard/BntxTournament/db1.db";
@@ -350,26 +351,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     		
     		Timestamp lastTimestamp = new Timestamp(0L);
     		Long offendingTeamId = 0L;
+    		Timestamp freezeTimestamp = new Timestamp(0L);
     		
 			for (Event event : match.getEvents()) {
 				Log.d("event code: ", event.getCode().toString());
-				Log.d("event timestamp: ", event.getTimestamp().toString() + " " + event.getTimestamp().getTime());
+				long eventTime = event.getTimestamp().getTime();
+				Log.d("event timestamp: ", event.getTimestamp().toString() + " " + eventTime);
 				if(event.getCode() == Event.PULL) {
 					lastTimestamp = event.getTimestamp();
 					offendingTeamId = match.getOtherTeamId(event.getTargetId());
 				}
 				else if(event.getCode() == Event.BLOCK) {
-					offenseTimeForTeam.put(offendingTeamId, offenseTimeForTeam.get(offendingTeamId) + event.getTimestamp().getTime() - lastTimestamp.getTime());
+					offenseTimeForTeam.put(offendingTeamId, offenseTimeForTeam.get(offendingTeamId) + eventTime - lastTimestamp.getTime());
 					Log.d("team " + offendingTeamId + "dropped the disc, offending time:", offenseTimeForTeam.get(offendingTeamId).toString());
 					lastTimestamp = event.getTimestamp();
 					offendingTeamId = event.getTargetId();
 				}
 				else if(event.getCode() == Event.SCORE) {
-					offenseTimeForTeam.put(offendingTeamId, offenseTimeForTeam.get(offendingTeamId) + event.getTimestamp().getTime() - lastTimestamp.getTime());
+					offenseTimeForTeam.put(offendingTeamId, offenseTimeForTeam.get(offendingTeamId) + eventTime - lastTimestamp.getTime());
 					Log.d("team " + offendingTeamId + "scored, offending time:", offenseTimeForTeam.get(offendingTeamId).toString());
 					pointsForTeam.put(offendingTeamId, pointsForTeam.get(offendingTeamId) + 1);
 					lastTimestamp = event.getTimestamp();
 					offendingTeamId = event.getTargetId();
+				} else if(event.getCode() == Event.FREEZE) {
+					freezeTimestamp = event.getTimestamp();
+				} else if(event.getCode() == Event.PLAY_ON) {
+					// shift lastTimestamp by freeze period
+					if(freezeTimestamp.getTime() > 0) {
+						lastTimestamp = new Timestamp(lastTimestamp.getTime() + eventTime - freezeTimestamp.getTime());
+					} else {
+						Log.d("Time statistics", "Event play-on is called with no freeze event before");
+					}
 				}
 			}
 			for (Entry<Long, Long> entry : pointsForTeam.entrySet()) {

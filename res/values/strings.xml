@@ -25,5 +25,7 @@
     <string name="statistics">Statistics</string>
     <string name="half_time">Half time</string>
     <string name="end">End</string>
+    <string name="freeze">Freeze</string>
+    <string name="play_on">Play On</string>
 
 </resources>

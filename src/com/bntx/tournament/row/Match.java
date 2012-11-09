@@ -275,4 +275,18 @@ public class Match extends Row {
 		return Globals.getDb().getBlocksForTeamInMatch(Team.getById(teamId), this);
 	}
 	
+	public boolean isFreezed() {
+		boolean freezed = false;
+		List<Event> eventList = getEvents();
+		for (Event event : eventList) {
+			if(event.getCode() == Event.FREEZE) {
+				freezed = true;
+			}
+			if(event.getCode() == Event.PLAY_ON) {
+				freezed = false;
+			}
+		}
+		return freezed;
+	}
+	
 }

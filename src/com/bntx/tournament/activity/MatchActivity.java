@@ -23,6 +23,7 @@ import com.bntx.tournament.Globals;
 import com.bntx.tournament.R;
 import com.bntx.tournament.activity.list.ActivePlayerListActivity;
 import com.bntx.tournament.adapter.ScorePlayerAdapter;
+import com.bntx.tournament.row.Event;
 import com.bntx.tournament.row.Match;
 import com.bntx.tournament.row.Team;
 import com.bntx.tournament.row.TeamPlayer;
@@ -62,8 +63,9 @@ public class MatchActivity extends Activity {
 
 		textView1 = (TextView) findViewById(R.id.textView1);
 		textView3 = (TextView) findViewById(R.id.textView3);
-		Button button3 = (Button) findViewById(R.id.button3);
+		final Button button3 = (Button) findViewById(R.id.button3);
 		final Button button1 = (Button) findViewById(R.id.button1);
+		final Button freezeButton = (Button) findViewById(R.id.freezeButton);
 		
 		updateScoreBoard();
 		
@@ -141,6 +143,35 @@ public class MatchActivity extends Activity {
 					match.halfTime();
 					Globals.setSelectedTeam(null);
 					button1.setText(R.string.end);
+				}
+			}
+		});
+		
+		freezeButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				Log.d("MatchActivity", "freeze click");
+				Match match = Globals.getSelectedMatch();
+				if(match.isFreezed()) {
+					// is freezed, add play-on event and change button caption to freeze
+					// enable other controls
+					match.addEvent(Event.PLAY_ON);
+					freezeButton.setText(R.string.freeze);
+					textView1.setEnabled(true);
+					textView3.setEnabled(true);
+					button1.setEnabled(true);
+					button3.setEnabled(true);
+					
+				} else {
+					// is not freezed, add freeze event and change button caption to play-on
+					// disable other controls
+					match.addEvent(Event.FREEZE);
+					freezeButton.setText(R.string.play_on);
+					textView1.setEnabled(false);
+					textView3.setEnabled(false);
+					button1.setEnabled(false);
+					button3.setEnabled(false);
 				}
 			}
 		});
