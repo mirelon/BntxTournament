@@ -5,10 +5,12 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +41,8 @@ public class MatchActivity extends Activity {
 	protected Spinner spinner1;
 	protected Spinner spinner2;
 
+	protected SharedPreferences preferences;
+	
 	protected void toastShort(String text) {
 		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
 	}
@@ -54,6 +58,9 @@ public class MatchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.match);
 		
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		
 		Globals.setSelectedTeam(null);
 		if(Globals.getSelectedMatch().getEvents().size() == 0) {
 			Globals.getSelectedMatch().start();
@@ -64,7 +71,7 @@ public class MatchActivity extends Activity {
 		textView1 = (TextView) findViewById(R.id.textView1);
 		textView3 = (TextView) findViewById(R.id.textView3);
 		final Button button3 = (Button) findViewById(R.id.button3);
-		final Button button1 = (Button) findViewById(R.id.button1);
+		final Button halfTimeButton = (Button) findViewById(R.id.button1);
 		final Button freezeButton = (Button) findViewById(R.id.freezeButton);
 		
 		updateScoreBoard();
@@ -129,20 +136,24 @@ public class MatchActivity extends Activity {
 			}
 		});
 		
+
+		if(! preferences.getBoolean(SettingsActivity.ALLOW_HALFTIME, false)) {
+			halfTimeButton.setText(R.string.end);
+		}
 		
-		button1.setOnClickListener(new OnClickListener() {
+		halfTimeButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				Log.d("MatchActivity", "half-time click");
 				Match match = Globals.getSelectedMatch();
-				if(match.isAfterHalfTime()) {
+				if(! preferences.getBoolean(SettingsActivity.ALLOW_HALFTIME, false) || match.isAfterHalfTime()) {
 					match.end();
 					Globals.setSelectedTeam(null);
 				} else {
 					match.halfTime();
 					Globals.setSelectedTeam(null);
-					button1.setText(R.string.end);
+					halfTimeButton.setText(R.string.end);
 				}
 			}
 		});
@@ -160,7 +171,7 @@ public class MatchActivity extends Activity {
 					freezeButton.setText(R.string.freeze);
 					textView1.setEnabled(true);
 					textView3.setEnabled(true);
-					button1.setEnabled(true);
+					halfTimeButton.setEnabled(true);
 					button3.setEnabled(true);
 					
 				} else {
@@ -170,7 +181,7 @@ public class MatchActivity extends Activity {
 					freezeButton.setText(R.string.play_on);
 					textView1.setEnabled(false);
 					textView3.setEnabled(false);
-					button1.setEnabled(false);
+					halfTimeButton.setEnabled(false);
 					button3.setEnabled(false);
 				}
 			}

@@ -109,6 +109,16 @@ public class BntxTournamentActivity extends Activity {
 		        builder.show();
 			}
 		});
+        
+        Button settingsButton = (Button) findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+		        Log.d("BntxTournamentActivity", "settings click");
+				startActivity(new Intent(BntxTournamentActivity.this, SettingsActivity.class));
+			}
+		});
     }
     
 }

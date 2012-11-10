@@ -27,5 +27,7 @@
     <string name="end">End</string>
     <string name="freeze">Freeze</string>
     <string name="play_on">Play On</string>
+    <string name="allow_halftime">Allow halftime</string>
+    <string name="settings">Settings</string>
 
 </resources>

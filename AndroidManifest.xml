@@ -55,6 +55,10 @@
             android:name=".activity.list.ActivePlayerListActivity"
             android:label="@string/player_list" >
         </activity>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/settings" >
+        </activity>
     </application>
 
 </manifest>

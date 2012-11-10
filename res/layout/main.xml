@@ -34,4 +34,10 @@
         android:layout_height="wrap_content"
         android:text="@string/statistics" />
 
+    <Button
+        android:id="@+id/settingsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings" />
+
 </LinearLayout>
