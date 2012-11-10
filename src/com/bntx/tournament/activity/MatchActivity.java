@@ -73,6 +73,7 @@ public class MatchActivity extends Activity {
 		final Button button3 = (Button) findViewById(R.id.button3);
 		final Button halfTimeButton = (Button) findViewById(R.id.button1);
 		final Button freezeButton = (Button) findViewById(R.id.freezeButton);
+		final Button undoButton = (Button) findViewById(R.id.undoButton);
 		
 		updateScoreBoard();
 		
@@ -183,6 +184,22 @@ public class MatchActivity extends Activity {
 					textView3.setEnabled(false);
 					halfTimeButton.setEnabled(false);
 					button3.setEnabled(false);
+				}
+			}
+		});
+		
+		undoButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Event deletedEvent = Globals.getSelectedMatch().undo();
+				if(deletedEvent != null) {
+					toastShort("Last event was deleted: " + deletedEvent.getName());
+					Intent intent = getIntent();
+					finish();
+					startActivity(intent);
+				} else {
+					toastShort("Cannot undo, maybe no event in db for match " + Globals.getSelectedMatch().getId());
 				}
 			}
 		});

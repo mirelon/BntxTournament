@@ -412,5 +412,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	return stats;
     	
     }
+
+    /**
+     * Returns number of rows deleted (0 or 1)
+     * @param match
+     * @return
+     */
+	public int deleteLastEvent(Match match) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		return db.delete(
+				"events",
+				"_id = (SELECT _id FROM events WHERE match_id = ? ORDER BY timestamp DESC LIMIT 1)",
+				new String[]{Long.toString(match.getId())}
+		);
+	}
     
 }

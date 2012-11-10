@@ -289,4 +289,24 @@ public class Match extends Row {
 		return freezed;
 	}
 	
+	/**
+	 * Returns deleted Event, or null
+	 * @return
+	 */
+	public Event undo() {
+		getEvents();
+		if(eventList.size() > 0) {
+			Event event = eventList.get(eventList.size()-1);
+			if(Globals.getDb().deleteLastEvent(this) == 1) {
+				eventList.remove(eventList.size()-1);
+				return event;
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
+		
+	}
+	
 }
